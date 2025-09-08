@@ -1,6 +1,7 @@
 // Importa los módulos necesarios
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
+const multer = require('multer'); // Importa Multer
 
 // Inicializa la aplicación Express
 const app = express();
@@ -10,6 +11,9 @@ const port = 8000;
 // Es necesario para que Express pueda leer los datos enviados en los cuerpos de las peticiones POST y PUT.
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Configura Multer para manejar datos de formulario sin archivos (multipart/form-data)
+const upload = multer();
 
 // Función de ayuda para obtener una conexión a la base de datos
 function dbConnection() {
@@ -38,9 +42,11 @@ app.route('/students')
     // Cierra la conexión a la base de datos
     db.close();
   })
-  .post((req, res) => {
+  // Middleware de Multer para manejar form-data
+  .post(upload.none(), (req, res) => {
     // Maneja la petición POST para crear un nuevo estudiante
     const db = dbConnection();
+    // La desestructuración de req.body ahora funcionará correctamente con form-data
     const { firstname, lastname, gender, age } = req.body;
     const sql = `INSERT INTO students (firstname, lastname, gender, age) VALUES (?, ?, ?, ?)`;
 
@@ -72,7 +78,8 @@ app.route('/student/:id')
     });
     db.close();
   })
-  .put((req, res) => {
+  // Middleware de Multer para manejar form-data
+  .put(upload.none(), (req, res) => {
     // Maneja la petición PUT para actualizar un estudiante por ID
     const db = dbConnection();
     const { firstname, lastname, gender, age } = req.body;
