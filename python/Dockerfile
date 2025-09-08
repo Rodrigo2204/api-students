@@ -1,5 +1,5 @@
 FROM python:3-slim
-WORKDIR /programas/api-students
+WORKDIR /programas/api-students/python
 RUN pip3 install flask
 COPY . .
 RUN python3 db.py
